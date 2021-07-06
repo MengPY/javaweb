@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<button onclick="getUser()">get users</button>
+<input type="text" id="userName" />
+<button onclick="delUsers()">del users</button>
+<button onclick="insertUser()">insertUser</button>
+<button onclick="getUserById(5)">get userid 5</button>
+<ul id="userList">
+<!--    <li></li>-->
+</ul>
+</body>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    function getUser () {
+        $.ajax({
+            url: 'http://localhost:8081/getUser',
+            datatype: 'json',
+            success: function (res) {
+                console.log(res)
+                let data = res.data || [];
+                let str = '';
+                data.forEach(item => {
+                    str+= `<li> ${item.name}-${item.age}-${item.email} </li>`
+                })
+                $('#userList').html(str)
+            }
+        })
+    }
+    function getUserById (id) {
+        $.ajax({
+            url: 'http://localhost:8081/selectUserById?id='+id,
+            datatype: 'json',
+            success: function (res) {
+                console.log(res)
+                let data = [res.data] || [];
+                let str = '';
+                data.forEach(item => {
+                    str+= `<li> ${item.name}-${item.age}-${item.email} </li>`
+                })
+                $('#userList').html(str)
+            }
+        })
+    }
+    function insertUser () {
+        $.ajax({
+            url: 'http://localhost:8081/userInsert',
+            dataType: 'json',
+            contentType: "application/json",
+            type: 'post',
+            data: JSON.stringify({
+                name: 'mpy',
+                age: 23,
+                email: 'mpy98128@gmail.com'
+            }),
+            success: function (res) {
+                console.log(res);
+                getUser();
+            }
+        })
+    }
+    function delUsers () {
+        if (!$('#userName').val()) {
+            alert('请输入要删除的用户名')
+            return;
+        }
+        $.ajax({
+            url: 'http://localhost:8081/deleteUserByMap',
+            dataType: 'json',
+            contentType: "application/json",
+            type: 'post',
+            data: JSON.stringify({
+                name: $('#userName').val()
+            }),
+            success: function (res) {
+                console.log(res);
+                getUser();
+            }
+        })
+    }
+</script>
+</html>
